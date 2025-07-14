@@ -11,7 +11,8 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader \
- && chmod -R 777 writable
+ && mkdir -p /var/www/html/writable/cache \
+ && chmod -R 777 /var/www/html/writable
 
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
