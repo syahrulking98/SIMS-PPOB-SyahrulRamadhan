@@ -3,7 +3,7 @@
       "builder": "NIXPACKS"
     },
     "deploy": {
-      "startCommand": "php -S 0.0.0.0:8080 -t public"
+      "startCommand": "chmod -R 777 writable && php -S 0.0.0.0:8080 -t public"
     }
   }
   
