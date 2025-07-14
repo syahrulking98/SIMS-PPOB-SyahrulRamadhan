@@ -1,20 +1,36 @@
-FROM php:8.2-cli
+FROM php:8.2-fpm
 
-RUN apt-get update && apt-get install -y unzip zip curl && \
-    docker-php-ext-install pdo pdo_mysql
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    curl \
+    zip \
+    unzip \
+    git \
+    libzip-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo pdo_mysql zip
 
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
-
+# Copy project files
+WORKDIR /var/www/html
 COPY . .
 
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
+# Set folder permission
 RUN chmod -R 777 writable
 
-ENV CI_ENVIRONMENT=production
+# Copy nginx config
+COPY default.conf /etc/nginx/conf.d/default.conf
 
+# Expose port
 EXPOSE 8080
 
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+# Start services
+CMD service nginx start && php-fpm
