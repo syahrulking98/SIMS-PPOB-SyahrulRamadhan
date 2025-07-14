@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
+    supervisor \
     libzip-dev \
     libpng-dev \
     libonig-dev \
@@ -32,8 +33,11 @@ RUN chmod -R 777 writable
 # Copy nginx config
 COPY default.conf /etc/nginx/conf.d/default.conf
 
+# Copy supervisord config
+COPY supervisord.conf /etc/supervisord.conf
+
 # Expose port
 EXPOSE 8080
 
-# Start nginx and PHP-FPM
-CMD service nginx start && php-fpm
+# Start both nginx & php-fpm using supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
