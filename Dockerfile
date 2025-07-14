@@ -11,19 +11,22 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+    libicu-dev \
+    && docker-php-ext-install pdo pdo_mysql zip intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy project files
+# Set working directory
 WORKDIR /var/www/html
+
+# Copy project files
 COPY . .
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set folder permission
+# Set permission
 RUN chmod -R 777 writable
 
 # Copy nginx config
@@ -32,5 +35,5 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 # Expose port
 EXPOSE 8080
 
-# Start services
+# Start nginx and PHP-FPM
 CMD service nginx start && php-fpm
